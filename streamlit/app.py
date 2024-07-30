@@ -161,35 +161,46 @@ def setup_about():
                 )
 
         if st.form_submit_button('추론 시작하기!'):
-            with st.spinner():
-                client = OpenAI(api_key=api_key)
-                df_questions = pd.read_json('FinBench_train.jsonl', lines=True)
-                single_turn_outputs = []
-                for question in df_questions['questions']:
-                    messages = [
-                        {"role": "system", "content": 'You are an AI assistant. You will be given a task. You must generate a detailed and long answer.'},
-                        {"role": "user", "content": str(question)}
-                    ]
-                    response = client.chat.completions.create(
-                        model=selected_option,  # 여기서 selected_option은 선택한 모델 이름입니다.
-                        messages=messages,
-                        max_tokens=4096
-                    )
-                    single_turn_outputs.append(response.choices[0].message.content.strip())
-
-                # 결과 처리
-                df_output = pd.DataFrame({
-                    'id': df_questions['id'],
-                    'category': df_questions['category'],
-                    'questions': df_questions['questions'],
-                    'outputs': single_turn_outputs,
-                    'references': df_questions['references']
-                })
-
-                json_output = df_output.to_json(orient='records', lines=True, force_ascii=False)
-                st.session_state['json_output'] = json_output
-                st.session_state['selected_option_name'] = selected_option_name
-                upload_to_github(api_key, "CPM-AI/Kor_Finance-leaderboard", f"./data/{st.session_state['selected_option_name'].replace('/', '_')}.json", json_output)
+                    if not api_key:
+                        st.error("OpenAI API 키를 입력해주세요.")
+                    else:
+                        with st.spinner('추론 중...'):
+                            try:
+                                # OpenAI 클라이언트 초기화
+                                client = OpenAI(api_key=api_key)
+        
+                                df_questions = pd.read_json('FinBench_train.jsonl', lines=True)
+                                single_turn_outputs = []
+                                for question in df_questions['questions']:
+                                    messages = [
+                                        {"role": "system", "content": 'You are an AI assistant. You will be given a task. You must generate a detailed and long answer.'},
+                                        {"role": "user", "content": str(question)}
+                                    ]
+                                    response = client.chat.completions.create(
+                                        model=selected_option_type.split()[1],  # "🟢 gpt-3.5-turbo" 에서 "gpt-3.5-turbo" 추출
+                                        messages=messages,
+                                        max_tokens=4096
+                                    )
+                                    single_turn_outputs.append(response.choices[0].message.content.strip())
+        
+                                df_output = pd.DataFrame({
+                                    'id': df_questions['id'],
+                                    'category': df_questions['category'],
+                                    'questions': df_questions['questions'],
+                                    'outputs': single_turn_outputs,
+                                    'references': df_questions['references']
+                                })
+        
+                                json_output = df_output.to_json(orient='records', lines=True, force_ascii=False)
+                                st.session_state['json_output'] = json_output
+                                st.session_state['selected_option_name'] = selected_option_name
+                                
+                                # GitHub에 업로드하는 부분 (이전 코드에서 유지)
+                                upload_to_github(github_token, "CPM-AI/Kor_Finance-leaderboard", f"./data/{st.session_state['selected_option_name'].replace('/', '_')}.json", json_output)
+        
+                                st.success("추론이 완료되었습니다.")
+                            except Exception as e:
+                                st.error(f"추론 중 오류가 발생했습니다: {str(e)}")
 
     if 'json_output' in st.session_state:
         st.download_button(
