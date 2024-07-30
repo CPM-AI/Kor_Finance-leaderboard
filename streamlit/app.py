@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-import openai
+from openai import OpenAI
 import os
 import datetime
 import base64
@@ -96,7 +96,7 @@ def setup_about():
         import os
 
         # OpenAI 클라이언트 초기화
-        client = OpenAI(api_key=api_key)
+        client = openai.OpenAI(api_key=os.environ.get("OPENAI_API_KEY", "API_KEY 입력"))
 
         # 학습 데이터 업로드
         def data_loader(train_file):
@@ -159,7 +159,7 @@ def setup_about():
 
         if st.form_submit_button('추론 시작하기!'):
             with st.spinner():
-                openai.api_key = api_key
+                client = OpenAI(api_key=api_key)
                 df_questions = pd.read_json('FinBench_train.jsonl', lines=True)
                 single_turn_outputs = []
                 for question in df_questions['questions']:
