@@ -95,7 +95,8 @@ def setup_about():
         import openai
         import os
 
-        client = openai.OpenAI(api_key=os.environ.get("OPENAI_API_KEY", "API_KEY 입력"))
+        # OpenAI 클라이언트 초기화
+        client = OpenAI(api_key=api_key)
 
         # 학습 데이터 업로드
         def data_loader(train_file):
@@ -166,13 +167,14 @@ def setup_about():
                         {"role": "system", "content": 'You are an AI assistant. You will be given a task. You must generate a detailed and long answer.'},
                         {"role": "user", "content": str(question)}
                     ]
-                    response = openai.Completion.create(
-                        model=selected_option_type,
-                        prompt="\n".join([m["content"] for m in messages]),
+                    response = client.chat.completions.create(
+                        model=selected_option,  # 여기서 selected_option은 선택한 모델 이름입니다.
+                        messages=messages,
                         max_tokens=4096
                     )
-                    single_turn_outputs.append(response['choices'][0]['text'].strip())
+                    single_turn_outputs.append(response.choices[0].message.content.strip())
 
+                # 결과 처리
                 df_output = pd.DataFrame({
                     'id': df_questions['id'],
                     'category': df_questions['category'],
