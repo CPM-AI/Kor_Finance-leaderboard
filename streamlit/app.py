@@ -13,7 +13,8 @@ st.set_page_config(
     layout="wide",
 )
 
-api_key = st.secrets['TOKEN'] 
+# Load the API key from Streamlit secrets
+api_key = st.secrets['TOKEN']
 
 def upload_to_github(token, repo, path, content):
     url = f"https://api.github.com/repos/{repo}/contents/{path}"
@@ -33,13 +34,11 @@ def upload_to_github(token, repo, path, content):
         st.error(f"응답 내용: {response.json()}")
 
 def setup_basic():
-    url = 'https://personaai.co.kr/main'
     st.title(title)
-
     st.markdown(
         "🚀 Open-Ko-Finance-LLM 리더보드는 한국어 금융 분야의 전문적인 지식을 대형 언어 모델로 객관적인 평가를 수행합니다.\n"
     )
-    st.markdown( f" 이 리더보드는 [PersonaAI](https://personaai.co.kr/main)와 [전남대학교](https://aicoss.kr/www/)가 공동 주최하며, [PersonaAI](https://personaai.co.kr/main)에서 운영합니다.")
+    st.markdown(f" 이 리더보드는 [PersonaAI](https://personaai.co.kr/main)와 [전남대학교](https://aicoss.kr/www/)가 공동 주최하며, [PersonaAI](https://personaai.co.kr/main)에서 운영합니다.")
 
 def setup_about():
     css = '''
@@ -59,7 +58,6 @@ def setup_about():
     }
     </style>
     '''
-
     st.markdown(css, unsafe_allow_html=True)
 
     tab1, tab2, tab3 = st.tabs(["📖 About", "🚀Submit here!", "🏅 LLM BenchMark"])
@@ -142,7 +140,6 @@ def setup_about():
                         placeholder='여기에 입력해주세요',
                         help='sk-xxxxxxxxxxxxxx'
                     )
-                    client = openai.OpenAI(api_key=os.environ.get("OPENAI_API_KEY", api_key))
 
             with col2:
                 with st.expander('Expander 2'):
@@ -155,9 +152,9 @@ def setup_about():
                         ("🟢 gpt-3.5-turbo", "⭕ gpt-4-o-mini")
                     )
 
-
             if st.form_submit_button('추론 시작하기!'):
                 with st.spinner():
+                    openai.api_key = api_key
                     df_questions = pd.read_json('FinBench_train.jsonl', lines=True)
                     single_turn_outputs = []
                     for question in df_questions['questions']:
@@ -165,7 +162,7 @@ def setup_about():
                             {"role": "system", "content": 'You are an AI assistant. You will be given a task. You must generate a detailed and long answer.'},
                             {"role": "user", "content": str(question)}
                         ]
-                        response = client.chat.completions.create(
+                        response = openai.ChatCompletion.create(
                             model=selected_option,
                             messages=messages,
                             max_tokens=4096
@@ -193,8 +190,6 @@ def setup_about():
                 mime='text/json'
             )
         
-        
-
     with tab3:
         st.markdown('<h5> 👩‍✈️ 전남대 금융 LLM 리더보드 평가 규칙</h5>', unsafe_allow_html=True)
         st.markdown('1️⃣ 점수 산출은 Public과 Private 점수의 평균으로 산출합니다.')
