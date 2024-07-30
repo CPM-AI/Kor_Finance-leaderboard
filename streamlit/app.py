@@ -29,7 +29,8 @@ def upload_to_github(token, repo, path, content):
     if response.status_code == 201:
         st.success("추론 완료")
     else:
-        st.error(f"추론 실패")
+        st.error(f"추론 실패: {response.status_code}")
+        st.error(f"응답 내용: {response.json()}")
 
 def setup_basic():
     url = 'https://personaai.co.kr/main'
