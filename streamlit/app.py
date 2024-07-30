@@ -14,7 +14,11 @@ st.set_page_config(
 )
 
 # Load the API key from Streamlit secrets
-api_key = st.secrets['TOKEN']
+try:
+    github_token = st.secrets['GITHUB_TOKEN']
+except KeyError:
+    st.error("GITHUB_TOKEN 환경 변수가 설정되지 않았습니다. 'Manage app'에서 환경 변수를 설정하세요.")
+
 
 def upload_to_github(token, repo, path, content):
     url = f"https://api.github.com/repos/{repo}/contents/{path}"
