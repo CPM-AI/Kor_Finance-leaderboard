@@ -12,6 +12,7 @@ st.set_page_config(
     page_icon="🏆",
     layout="wide",
 )
+
 api_key = os.getenv('API_KEY') 
 st.write(api_key)
 
