@@ -124,39 +124,39 @@ def setup_about():
         st.markdown('• 추론이 끝나면 아래 다운로드 버튼을 클릭하여, 저장된 Jsonl 파일을 아래 이메일로 보내주시면, 리더보드에 결과가 반영이 됩니다.')
         st.markdown('모델 제출 이메일 : anstmdwn45@personaai.co.kr')
         
-        with st.form(key='inference_form_1'):  # 고유한 키 부여
-            st.subheader('📋 인퍼런스 결과 생성')
+    with st.form(key='inference_form_1'):  # 고유한 키 부여
+        st.subheader('📋 인퍼런스 결과 생성')
 
-            # 텍스트 입력 상자
-            col1, col2 = st.columns([0.54, 0.46])
-            
-            with col1:
-                with st.expander('Expander 1'):
-                    selected_option = st.text_input(
-                        "모델 이름을 입력하세요.", 
-                        placeholder='여기에 입력해주세요',
-                        help='모델명 예시 ft:gpt-모델명:personal:파인튜닝 모델명'
-                    )
-                    api_key = st.text_input(
-                        label='OpenAPI Key를 입력하세요.', 
-                        max_chars=100, 
-                        type='password',
-                        placeholder='여기에 입력해주세요',
-                        help='sk-xxxxxxxxxxxxxx'
-                    )
+        # 텍스트 입력 상자
+        col1, col2 = st.columns([0.54, 0.46])
+        
+        with col1:
+            with st.expander('Expander 1'):
+                selected_option = st.text_input(
+                    "모델 이름을 입력하세요.", 
+                    placeholder='여기에 입력해주세요',
+                    help='모델명 예시 ft:gpt-모델명:personal:파인튜닝 모델명'
+                )
+                api_key = st.text_input(
+                    label='OpenAPI Key를 입력하세요.', 
+                    max_chars=100, 
+                    type='password',
+                    placeholder='여기에 입력해주세요',
+                    help='sk-xxxxxxxxxxxxxx'
+                )
 
-            with col2:
-                with st.expander('Expander 2'):
-                    selected_option_name = st.text_input(
-                        "소속 팀이름을 입력하세요.", 
-                        placeholder='여기에 입력해주세요'
-                    )
-                    selected_option_type = st.selectbox(
-                        "모델 타입을 입력하세요.",
-                        ("🟢 gpt-3.5-turbo", "⭕ gpt-4-o-mini")
-                    )
+        with col2:
+            with st.expander('Expander 2'):
+                selected_option_name = st.text_input(
+                    "소속 팀이름을 입력하세요.", 
+                    placeholder='여기에 입력해주세요'
+                )
+                selected_option_type = st.selectbox(
+                    "모델 타입을 입력하세요.",
+                    ("🟢 gpt-3.5-turbo", "⭕ gpt-4-o-mini")
+                )
 
-            if st.form_submit_button('추론 시작하기!'):
+        if st.form_submit_button('추론 시작하기!'):
             with st.spinner():
                 openai.api_key = api_key
                 df_questions = pd.read_json('FinBench_train.jsonl', lines=True)
