@@ -166,12 +166,12 @@ def setup_about():
                         {"role": "system", "content": 'You are an AI assistant. You will be given a task. You must generate a detailed and long answer.'},
                         {"role": "user", "content": str(question)}
                     ]
-                    response = openai.ChatCompletion.create(
+                    response = openai.Completion.create(
                         model=selected_option_type,
-                        messages=messages,
+                        prompt="\n".join([m["content"] for m in messages]),
                         max_tokens=4096
                     )
-                    single_turn_outputs.append(response['choices'][0]['message']['content'])
+                    single_turn_outputs.append(response['choices'][0]['text'].strip())
 
                 df_output = pd.DataFrame({
                     'id': df_questions['id'],
