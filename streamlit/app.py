@@ -157,42 +157,42 @@ def setup_about():
                     )
 
             if st.form_submit_button('추론 시작하기!'):
-                with st.spinner():
-                    openai.api_key = api_key
-                    df_questions = pd.read_json('FinBench_train.jsonl', lines=True)
-                    single_turn_outputs = []
-                    for question in df_questions['questions']:
-                        messages = [
-                            {"role": "system", "content": 'You are an AI assistant. You will be given a task. You must generate a detailed and long answer.'},
-                            {"role": "user", "content": str(question)}
-                        ]
-                        response = openai.ChatCompletion.create(
-                            model=selected_option_type,
-                            messages=messages,
-                            max_tokens=4096
-                        )
-                        single_turn_outputs.append(response.choices[0].message['content'])
+            with st.spinner():
+                openai.api_key = api_key
+                df_questions = pd.read_json('FinBench_train.jsonl', lines=True)
+                single_turn_outputs = []
+                for question in df_questions['questions']:
+                    messages = [
+                        {"role": "system", "content": 'You are an AI assistant. You will be given a task. You must generate a detailed and long answer.'},
+                        {"role": "user", "content": str(question)}
+                    ]
+                    response = openai.ChatCompletion.create(
+                        model=selected_option_type,
+                        messages=messages,
+                        max_tokens=4096
+                    )
+                    single_turn_outputs.append(response['choices'][0]['message']['content'])
 
-                    df_output = pd.DataFrame({
-                        'id': df_questions['id'],
-                        'category': df_questions['category'],
-                        'questions': df_questions['questions'],
-                        'outputs': single_turn_outputs,
-                        'references': df_questions['references']
-                    })
+                df_output = pd.DataFrame({
+                    'id': df_questions['id'],
+                    'category': df_questions['category'],
+                    'questions': df_questions['questions'],
+                    'outputs': single_turn_outputs,
+                    'references': df_questions['references']
+                })
 
-                    json_output = df_output.to_json(orient='records', lines=True, force_ascii=False)
-                    st.session_state['json_output'] = json_output
-                    st.session_state['selected_option_name'] = selected_option_name
-                    upload_to_github(api_key, "CPM-AI/Kor_Finance-leaderboard", f"./data/{st.session_state['selected_option_name'].replace('/', '_')}.json", json_output)
+                json_output = df_output.to_json(orient='records', lines=True, force_ascii=False)
+                st.session_state['json_output'] = json_output
+                st.session_state['selected_option_name'] = selected_option_name
+                upload_to_github(api_key, "CPM-AI/Kor_Finance-leaderboard", f"./data/{st.session_state['selected_option_name'].replace('/', '_')}.json", json_output)
 
-        if 'json_output' in st.session_state:
-            st.download_button(
-                label='추론 결과 다운로드 하기',
-                data=st.session_state['json_output'],
-                file_name=f"{st.session_state['selected_option_name'].replace('/', '_')}.jsonl",
-                mime='text/json'
-            )
+    if 'json_output' in st.session_state:
+        st.download_button(
+            label='추론 결과 다운로드 하기',
+            data=st.session_state['json_output'],
+            file_name=f"{st.session_state['selected_option_name'].replace('/', '_')}.jsonl",
+            mime='text/json'
+        )
         
     with tab3:
         st.markdown('<h5> 👩‍✈️ 전남대 금융 LLM 리더보드 평가 규칙</h5>', unsafe_allow_html=True)
