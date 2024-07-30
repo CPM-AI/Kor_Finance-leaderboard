@@ -26,10 +26,21 @@ def upload_to_github(token, repo, path, content):
         "Authorization": f"token {token}",
         "Content-Type": "application/json"
     }
+    
+    # 먼저 파일의 sha 값을 가져오기 위해 GET 요청을 보냅니다.
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        sha = response.json().get('sha')
+    else:
+        sha = None
+
     data = {
         "message": "Add inference result",
         "content": base64.b64encode(content.encode()).decode()
     }
+    if sha:
+        data["sha"] = sha
+
     # 파일을 업데이트하기 위해 PUT 요청을 보냅니다.
     response = requests.put(url, headers=headers, json=data)
     if response.status_code == 201:
