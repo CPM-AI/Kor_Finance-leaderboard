@@ -167,11 +167,11 @@ def setup_about():
                             {"role": "user", "content": str(question)}
                         ]
                         response = openai.ChatCompletion.create(
-                            model=selected_option,
+                            model=selected_option_type,
                             messages=messages,
                             max_tokens=4096
                         )
-                        single_turn_outputs.append(response.choices[0].message.content)
+                        single_turn_outputs.append(response.choices[0].message['content'])
 
                     df_output = pd.DataFrame({
                         'id': df_questions['id'],
