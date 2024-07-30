@@ -157,7 +157,7 @@ def setup_about():
                 )
                 selected_option_type = st.selectbox(
                     "모델 타입을 입력하세요.",
-                    ("🟢 gpt-3.5-turbo", "⭕ gpt-4-o-mini")
+                    ("🟢 gpt-3.5-turbo", "⭕ gpt-4o-mini")
                 )
 
         if st.form_submit_button('추론 시작하기!'):
