@@ -188,7 +188,7 @@ def setup_about():
                                         {"role": "user", "content": str(question)}
                                     ]
                                     response = client.chat.completions.create(
-                                        model=selected_option.split()[1],  # "🟢 gpt-3.5-turbo" 에서 "gpt-3.5-turbo" 추출
+                                        model=selected_option.split(),  # "🟢 gpt-3.5-turbo" 에서 "gpt-3.5-turbo" 추출
                                         messages=messages,
                                         max_tokens=4096
                                     )
